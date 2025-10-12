@@ -1,0 +1,73 @@
+---
+import { sanity } from "../lib/sanity.js";
+import Nav from '../components/Nav.astro'
+
+const weeknotes = await sanity.fetch(`
+  *[_type == "weeknotes"] | order(publishedAt desc) {
+    _id,
+    title,
+    publishedAt,
+    slug
+  }
+`);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weeknotes</title>
+    <style>
+      body {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: system-ui, sans-serif;
+      }
+      .breadcrumbs {
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .breadcrumbs a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      article {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        border: 1px solid #eee;
+        border-radius: 8px;
+      }
+      article a {
+        text-decoration: none;
+        color: inherit;
+      }
+      article a:hover h2 {
+        color: #0066cc;
+      }
+    </style>
+  </head>
+  <body>
+    <body>
+  <Nav />
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <span>Weeknotes</span>
+    </nav>
+
+    <h1>Weeknotes</h1>
+
+    {
+      weeknotes.map((note) => (
+        <article>
+          <a href={`/weeknotes/${note.slug.current}`}>
+            <h2>{note.title}</h2>
+            <time>{new Date(note.publishedAt).toLocaleDateString()}</time>
+          </a>
+        </article>
+      ))
+    }
+  </body>
+</html>

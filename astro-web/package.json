@@ -1,0 +1,17 @@
+{
+  "name": "jake-brown-digital",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@portabletext/react": "^4.0.3",
+    "@portabletext/to-html": "^3.0.0",
+    "astro": "^5.14.4",
+    "astro-portabletext": "^0.11.3"
+  }
+}

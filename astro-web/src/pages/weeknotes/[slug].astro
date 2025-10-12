@@ -1,0 +1,200 @@
+---
+import { sanity } from "../../lib/sanity.js";
+import { PortableText } from "astro-portabletext";
+import Nav from '../../components/Nav.astro'
+
+
+
+// This tells Astro which pages to generate
+export async function getStaticPaths() {
+  const weeknotes = await sanity.fetch(`
+    *[_type == "weeknotes"] {
+      "slug": slug.current
+    }
+  `);
+
+  return weeknotes.map((weeknote) => ({
+    params: { slug: weeknote.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+// Fetch the specific weeknote
+const weeknote = await sanity.fetch(
+  `
+  *[_type == "weeknotes" && slug.current == $slug][0] {
+    _id,
+    title,
+    publishedAt,
+    intro,
+    work,
+    read,
+    listen,
+    play,
+    executiveLearning
+  }
+`,
+  { slug }
+);
+
+if (!weeknote) {
+  return Astro.redirect("/404");
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{weeknote.title}</title>
+    <style>
+      body {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: system-ui, sans-serif;
+        line-height: 1.6;
+      }
+
+      /* Breadcrumbs */
+      .breadcrumbs {
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .breadcrumbs a {
+        color: #0066cc;
+        text-decoration: none;
+      }
+      .breadcrumbs a:hover {
+        text-decoration: underline;
+      }
+      .breadcrumbs span {
+        margin: 0 0.5rem;
+      }
+
+      section {
+        margin: 2rem 0;
+      }
+
+      h2 {
+        margin-top: 2rem;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 0.5rem;
+      }
+
+      h3 {
+        margin-top: 1.5rem;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Breadcrumbs -->
+    <Nav />
+    <nav class="breadcrumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/weeknotes">Weeknotes</a>
+      <span>/</span>
+      <span>{weeknote.title}</span>
+    </nav>
+
+    <h1>{weeknote.title}</h1>
+    <time>{new Date(weeknote.publishedAt).toLocaleDateString()}</time>
+
+    {
+      weeknote.intro && weeknote.intro.length > 0 && (
+        <section>
+          <PortableText value={weeknote.intro} />
+        </section>
+      )
+    }
+
+    {
+      weeknote.work && weeknote.work.length > 0 && (
+        <section>
+          <h2>Work 💼</h2>
+          <PortableText value={weeknote.work} />
+        </section>
+      )
+    }
+
+    {
+      weeknote.read && (
+        <section>
+          <h2>Read 📚</h2>
+          {weeknote.read.work && weeknote.read.work.length > 0 && (
+            <div>
+              <h3>Work</h3>
+              <PortableText value={weeknote.read.work} />
+            </div>
+          )}
+          {weeknote.read.fun && weeknote.read.fun.length > 0 && (
+            <div>
+              <h3>Fun</h3>
+              <PortableText value={weeknote.read.fun} />
+            </div>
+          )}
+        </section>
+      )
+    }
+
+    {
+      weeknote.listen && (
+        <section>
+          <h2>Listen 🎧</h2>
+          {weeknote.listen.learn && weeknote.listen.learn.length > 0 && (
+            <div>
+              <h3>Learn</h3>
+              <PortableText value={weeknote.listen.learn} />
+            </div>
+          )}
+          {weeknote.listen.music && weeknote.listen.music.length > 0 && (
+            <div>
+              <h3>Music</h3>
+              <PortableText value={weeknote.listen.music} />
+            </div>
+          )}
+        </section>
+      )
+    }
+
+    {
+      weeknote.play && (
+        <section>
+          <h2>Play 🕹️📖📺💻</h2>
+          {weeknote.play.sports && weeknote.play.sports.length > 0 && (
+            <div>
+              <h3>Sports</h3>
+              <PortableText value={weeknote.play.sports} />
+            </div>
+          )}
+          {weeknote.play.watch && weeknote.play.watch.length > 0 && (
+            <div>
+              <h3>Watch</h3>
+              <PortableText value={weeknote.play.watch} />
+            </div>
+          )}
+          {weeknote.play.other && weeknote.play.other.length > 0 && (
+            <div>
+              <h3>Other</h3>
+              <PortableText value={weeknote.play.other} />
+            </div>
+          )}
+        </section>
+      )
+    }
+
+    {
+      weeknote.executiveLearning && weeknote.executiveLearning.length > 0 && (
+        <section>
+          <h2>Executive Learning 🧠</h2>
+          <PortableText value={weeknote.executiveLearning} />
+        </section>
+      )
+    }
+  </body>
+</html>
