@@ -1,6 +1,7 @@
 ---
 import { sanity } from "../lib/sanity.js";
 import Nav from "../components/Nav.astro";
+import ContactForm from '../components/ContactForm.astro'
 
 const homepage = await sanity.fetch(`
   *[_type == "homepage"][0] {
@@ -280,12 +281,8 @@ const homepage = await sanity.fetch(`
           )
         }
 
-        <form>
-          <input type="text" placeholder="Your name (required)" required />
-          <input type="email" placeholder="Your email (required)" required />
-          <textarea placeholder="Message (required)" required></textarea>
-          <button type="submit">Send Message</button>
-        </form>
+        <ContactForm />
+        
       </section>
     </main>
 
