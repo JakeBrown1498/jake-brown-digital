@@ -1,0 +1,48 @@
+---
+
+---
+
+<div class="logo-banner">
+  <div class="logo-inner">
+    <img src="/RSPCA_logo.png" alt="RSPCA logo" class="logo" />
+    <img src="/WWF_logo.png" alt="WWF logo" class="logo" />
+    <img src="/Unilever_logo.png" alt="Unilever logo" class="logo" />
+  </div>
+</div>
+
+<style>
+  .logo-banner {
+    background-color: var(--color--primary-light, #D9CCFF);
+    padding: 32px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xl, 64px);
+    background-color: var(--color--secondary-white, #FFFFFF);
+    border-radius: 10px;
+    padding: 24px 48px;
+  }
+
+  .logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  @media (max-width: 769px) {
+    .logo-inner {
+      gap: var(--space-lg, 36px);
+      padding: 24px 32px;
+    }
+
+    .logo {
+      height: 48px;
+    }
+  }
+</style>

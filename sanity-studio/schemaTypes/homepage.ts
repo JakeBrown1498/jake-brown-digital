@@ -65,7 +65,7 @@ export default defineType({
       of: [
         {
           type: 'reference',
-          to: [{type: 'weeknotes'}],
+          to: [{type: 'weeknotesV2'}],
         },
       ],
       validation: (Rule) => Rule.max(3),

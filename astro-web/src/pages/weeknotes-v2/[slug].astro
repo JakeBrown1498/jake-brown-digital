@@ -1,0 +1,266 @@
+---
+import { sanity } from "../../lib/sanity.js";
+import { PortableText } from "astro-portabletext";
+import Nav from "../../components/Nav.astro";
+import Footer from "../../components/Footer.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import WeeknotesHero from "../../components/WeeknotesHero.astro";
+import SpotifyCard from "../../components/SpotifyCard.astro";
+
+export async function getStaticPaths() {
+  const weeknotes = await sanity.fetch(`
+    *[_type == "weeknotesV2"] {
+      "slug": slug.current
+    }
+  `);
+
+  return weeknotes.map((weeknote) => ({
+    params: { slug: weeknote.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const weeknote = await sanity.fetch(
+  `
+  *[_type == "weeknotesV2" && slug.current == $slug][0] {
+    _id,
+    title,
+    publishedAt,
+    "heroImageUrl": heroImage.asset->url,
+    intro,
+    work,
+    read,
+    listen {
+      focus,
+      music[] {
+        spotifyUrl,
+        artist,
+        song,
+        rating,
+        genre
+      }
+    },
+    play {
+      sports,
+      watch[] {
+        title,
+        rating
+      },
+      other
+    }
+  }
+`,
+  { slug }
+);
+
+if (!weeknote) {
+  return Astro.redirect("/404");
+}
+
+const breadcrumbs = [
+  { label: "Home", href: "/" },
+  { label: "Weeknotes", href: "/weeknotes" },
+  { label: weeknote.title },
+];
+
+const renderStars = (rating: number) => {
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
+    <title>{weeknote.title} - Jake Brown</title>
+  </head>
+  <body>
+    <Nav />
+
+    <article class="weeknote-article">
+      <!-- Breadcrumbs -->
+      <Breadcrumbs items={breadcrumbs} />
+
+      <!-- Hero -->
+      <WeeknotesHero
+        title={weeknote.title}
+        publishedAt={weeknote.publishedAt}
+        imageUrl={weeknote.heroImageUrl}
+      />
+
+      <!-- Intro -->
+      {weeknote.intro && weeknote.intro.length > 0 && (
+        <section class="weeknote-section">
+          <div class="section-content">
+            <PortableText value={weeknote.intro} />
+          </div>
+        </section>
+      )}
+
+      <!-- Work -->
+      {weeknote.work && weeknote.work.length > 0 && (
+        <section class="weeknote-section">
+          <h2 class="h2-primary">Work</h2>
+          <div class="section-content">
+            <PortableText value={weeknote.work} />
+          </div>
+        </section>
+      )}
+
+      <!-- Read -->
+      {weeknote.read && (
+        <section class="weeknote-section">
+          <h2 class="h2-primary">Read 📚</h2>
+          {weeknote.read.work && weeknote.read.work.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Work</h3>
+              <div class="section-content">
+                <PortableText value={weeknote.read.work} />
+              </div>
+            </div>
+          )}
+          {weeknote.read.fun && weeknote.read.fun.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Fun</h3>
+              <div class="section-content">
+                <PortableText value={weeknote.read.fun} />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <!-- Listen -->
+      {weeknote.listen && (
+        <section class="weeknote-section">
+          <h2 class="h2-primary">Listen 🎧</h2>
+          {weeknote.listen.focus && weeknote.listen.focus.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Focus</h3>
+              <div class="section-content">
+                <PortableText value={weeknote.listen.focus} />
+              </div>
+            </div>
+          )}
+          {weeknote.listen.music && weeknote.listen.music.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Music</h3>
+              <div class="spotify-grid">
+                {weeknote.listen.music.map((track) => (
+                  <SpotifyCard url={track.spotifyUrl} />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      <!-- Play -->
+      {weeknote.play && (
+        <section class="weeknote-section">
+          <h2 class="h2-primary">Play 🕹️</h2>
+          {weeknote.play.sports && weeknote.play.sports.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Sports</h3>
+              <div class="section-content">
+                <PortableText value={weeknote.play.sports} />
+              </div>
+            </div>
+          )}
+          {weeknote.play.watch && weeknote.play.watch.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Watch</h3>
+              <ul class="watch-list">
+                {weeknote.play.watch.map((item) => (
+                  <li class="watch-item">
+                    <span class="watch-rating">{renderStars(item.rating || 0)}</span>
+                    <span class="watch-title">{item.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {weeknote.play.other && weeknote.play.other.length > 0 && (
+            <div class="subsection">
+              <h3 class="h3-primary">Other</h3>
+              <div class="section-content">
+                <PortableText value={weeknote.play.other} />
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+    </article>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .weeknote-article {
+    max-width: 100%;
+    padding-bottom: var(--space-xl, 64px);
+  }
+
+  .weeknote-section {
+    padding: 0 32px;
+    margin-top: var(--space-xl, 64px);
+  }
+
+  .weeknote-section h2 {
+    margin-bottom: var(--space-md, 16px);
+  }
+
+  .section-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 8px);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm, 14px);
+    line-height: 1.6;
+    color: var(--color--secondary-black, #000000);
+  }
+
+  .subsection {
+    margin-top: var(--space-lg, 36px);
+  }
+
+  .subsection h3 {
+    margin-bottom: var(--space-sm, 8px);
+  }
+
+  .spotify-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md, 16px);
+  }
+
+  .watch-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 8px);
+  }
+
+  .watch-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm, 8px);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm, 14px);
+  }
+
+  .watch-rating {
+    color: #f5c518;
+    letter-spacing: 1px;
+  }
+
+  .watch-title {
+    color: var(--color--secondary-black, #000000);
+  }
+</style>

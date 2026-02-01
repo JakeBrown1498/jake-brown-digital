@@ -3,7 +3,7 @@ import { sanity } from "../lib/sanity.js";
 import Nav from '../components/Nav.astro'
 
 const weeknotes = await sanity.fetch(`
-  *[_type == "weeknotes"] | order(publishedAt desc) {
+  *[_type == "weeknotesV2"] | order(publishedAt desc) {
     _id,
     title,
     publishedAt,
@@ -62,7 +62,7 @@ const weeknotes = await sanity.fetch(`
     {
       weeknotes.map((note) => (
         <article>
-          <a href={`/weeknotes/${note.slug.current}`}>
+          <a href={`/weeknotes-v2/${note.slug.current}`}>
             <h2>{note.title}</h2>
             <time>{new Date(note.publishedAt).toLocaleDateString()}</time>
           </a>

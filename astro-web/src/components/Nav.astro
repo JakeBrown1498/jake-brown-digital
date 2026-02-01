@@ -1,43 +1,302 @@
 ---
-import '/global.css';
-import '/tokens.css';
+import "./global.css";
+import "./tokens.css";
 ---
+
 <nav class="main-nav">
   <div class="nav-container">
-<!--Nav bar container-->
+    <!--Nav bar container-->
     <div class="nav-bar">
-    <!-- Logo -->
-    <a href="/" class="nav-logo">
-      <img src="/JBD_favicon.jpg" alt="Jake Brown Digital">
-    </a>
+      <!-- Logo -->
+      <a href="/" class="nav-logo">
+        <img src="/JBD_Favicon.svg" alt="Jake Brown Digital" />
+      </a>
 
-    <!--Nav Content -->
-    <div class="nav-content-container">
-    <!-- Desktop Navigation Links (hidden on mobile) -->
-    <ul class="nav-links desktop-only">
-      <li><a href="/weeknotes">Weeknotes</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/work">Work</a></li>
-    </ul>
+      <!--Nav Content -->
+      <div class="nav-content-container">
+        <!-- Desktop Navigation Links (hidden on mobile) -->
+        <ul class="nav-links desktop-only">
+          <li><a href="/weeknotes">Weeknotes</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
 
-     <!-- Right side controls -->
-    <div class="nav-controls">
-      <a href="/contact" class="contact-button">Contact</a>
-      <button class="menu-toggle" aria-label="Toggle menu">
-        <span></span>
+        <!-- Right side controls -->
+        <div class="nav-controls">
+          <a href="/contact" class="contact-button">Contact</a>
+          <button class="menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile & Tablet Menu (toggleable) -->
+    <div class="mobile-menu">
+      <button class="mobile-menu-close" aria-label="Close menu">
         <span></span>
         <span></span>
       </button>
+      <ul class="nav-links">
+        <li><a href="/weeknotes">Weeknotes</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
     </div>
-    </div>
-  </div>
-
-   <!-- Mobile & Tablet Menu (toggleable) -->
-  <div class="mobile-menu" hidden>
-    <ul class="nav-links">
-      <li><a href="/weeknotes">Weeknotes</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/work">Work</a></li>
-    </ul>
   </div>
 </nav>
+
+<style>
+  /* Navigation Bar Styles */
+.main-nav {
+      width: 100%;
+      background-color: transparent;
+      box-shadow: none;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin-bottom: 16px;
+}
+
+.nav-container {
+      background-color: transparent;
+      display: flex;
+      padding-top: 0px;
+      padding: 12px 32px;
+      align-items: center;
+      align-self: stretch;
+      justify-content: center;
+      position: relative;
+      z-index: 101;
+}
+
+.nav-bar {
+      display: flex;
+      box-sizing: border-box;
+      height: 64px;
+      border-radius: 40px;
+      background-color: var(--color--primary);
+      width: 100%;
+      max-width: 789px;
+      padding: 16px 32px;
+      align-items: center;
+      justify-content: space-between;
+}
+
+.nav-content-container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+}
+
+.nav-logo {
+      height: 36px;
+      width: auto;
+      border-radius: 3px;
+      display: flex;
+}
+
+.nav-links.desktop-only {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      list-style: none;
+      margin-left: auto;
+      align-items: center;
+}   
+
+.nav-links a {
+      color: #FFFFFF;
+      text-decoration: none;
+      position: relative;
+}
+
+.nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: #FFFFFF;
+      transition: width 0.5s ease;
+}
+
+.nav-links a:hover::after {
+      width: 100%;
+}
+
+.contact-button {
+      background-color: #FFFFFF;
+      color: #6733FF;
+      border: none;
+      border-radius: 26px;
+      padding: 8px 21px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+}
+
+.contact-button:hover {
+      background-color: var(--color--primary-light);
+      color: var(--color--secondary-dark);
+}
+
+.nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+}
+
+.menu-toggle {
+      display: none;
+      background: none;
+      border: 2px solid #FFFFFF;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      position: relative;
+      box-sizing: border-box;
+}
+
+.menu-toggle span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background-color: #FFFFFF;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: transform 0.3s ease, opacity 0.3s ease, top 0.3s ease;
+}
+
+.menu-toggle span:nth-child(1) {
+      top: 10px;
+}
+
+.menu-toggle span:nth-child(2) {
+      top: 16px;
+}
+
+.menu-toggle span:nth-child(3) {
+      top: 22px;
+}
+
+/* Animate to X when open */
+.menu-toggle.open span:nth-child(1) {
+      top: 16px;
+      transform: translateX(-50%) rotate(45deg);
+}
+
+.menu-toggle.open span:nth-child(2) {
+      opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+      top: 16px;
+      transform: translateX(-50%) rotate(-45deg);
+}
+
+.mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--color--primary);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      box-sizing: border-box;
+}
+
+.mobile-menu.open {
+      display: flex;
+}
+
+.mobile-menu .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      padding: 0;
+      margin: 0;
+      text-align: center;
+}
+
+.mobile-menu .nav-links a {
+      font-size: 1.5rem;
+}
+
+.mobile-menu-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+}
+
+.mobile-menu-close span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background-color: #FFFFFF;
+      position: absolute;
+      left: 4px;
+      top: 15px;
+}
+
+.mobile-menu-close span:nth-child(1) {
+      transform: rotate(45deg);
+}
+
+.mobile-menu-close span:nth-child(2) {
+      transform: rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+      .menu-toggle {
+            display: block;
+      }
+
+      .nav-links.desktop-only {
+            display: none;
+      }
+
+      .nav-bar.menu-open {
+            background-color: transparent;
+      }
+
+      .nav-bar.menu-open .contact-button {
+            display: none;
+      }
+}
+</style>
+
+<script>
+  const toggle = document.querySelector('.menu-toggle');
+  const menu = document.querySelector('.mobile-menu');
+  const navBar = document.querySelector('.nav-bar');
+  const closeBtn = document.querySelector('.mobile-menu-close');
+
+  toggle?.addEventListener('click', () => {
+    toggle.classList.toggle('open');
+    menu?.classList.toggle('open');
+    navBar?.classList.toggle('menu-open');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    toggle?.classList.remove('open');
+    menu?.classList.remove('open');
+    navBar?.classList.remove('menu-open');
+  });
+</script>

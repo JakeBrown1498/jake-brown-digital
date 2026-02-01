@@ -1,0 +1,214 @@
+---
+interface Props {
+  url: string;
+}
+
+const { url } = Astro.props;
+
+// 1. Extract Track ID from URL
+const getTrackId = (spotifyUrl: string) => {
+  try {
+    const urlObj = new URL(spotifyUrl);
+    const pathSegments = urlObj.pathname.split("/");
+    const trackIndex = pathSegments.indexOf("track");
+    if (trackIndex !== -1 && trackIndex + 1 < pathSegments.length) {
+      return pathSegments[trackIndex + 1];
+    }
+  } catch (e) {
+    // Fallback regex if URL parsing fails
+    const match = spotifyUrl.match(/track\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+  }
+  return null;
+};
+
+const trackId = getTrackId(url);
+
+// 2. Fetch Data from Spotify API
+const clientId = import.meta.env.SPOTIFY_CLIENT_ID;
+const clientSecret = import.meta.env.SPOTIFY_CLIENT_SECRET;
+
+let track = null;
+let artist = null;
+let error = null;
+
+if (!trackId) {
+  error = "Invalid Spotify URL";
+} else if (!clientId || !clientSecret) {
+  error = "Missing Spotify API Credentials in .env";
+} else {
+  try {
+    // A. Get Access Token (Client Credentials Flow)
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
+      "base64",
+    );
+    const tokenRes = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ grant_type: "client_credentials" }),
+    });
+
+    if (!tokenRes.ok) throw new Error("Failed to obtain access token");
+    const { access_token } = await tokenRes.json();
+
+    // B. Get Track Details
+    const trackRes = await fetch(
+      `https://api.spotify.com/v1/tracks/${trackId}`,
+      {
+        headers: { Authorization: `Bearer ${access_token}` },
+      },
+    );
+
+    if (!trackRes.ok) throw new Error("Failed to fetch track");
+    track = await trackRes.json();
+
+    // C. Get Artist Details (Required to get Genre)
+    if (track.artists && track.artists.length > 0) {
+      const artistId = track.artists[0].id;
+      const artistRes = await fetch(
+        `https://api.spotify.com/v1/artists/${artistId}`,
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
+        },
+      );
+      if (artistRes.ok) {
+        artist = await artistRes.json();
+      }
+    }
+  } catch (e) {
+    console.error("Spotify Fetch Error:", e);
+    error = "Error loading Spotify data";
+  }
+}
+
+// 3. Prepare Display Data
+const imageUrl = track?.album?.images?.[0]?.url;
+const songName = track?.name;
+const artistName = track?.artists?.map((a: any) => a.name).join(", ");
+// Capitalize first letter of genre
+const genre = artist?.genres?.[0]
+  ? artist.genres[0].charAt(0).toUpperCase() + artist.genres[0].slice(1)
+  : "Genre not available";
+---
+
+<article class="spotify-card">
+  {
+    error ? (
+      <div class="error-message">{error}</div>
+    ) : (
+      <>
+        <div class="image-container">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={`${songName} album art`}
+              class="album-art"
+            />
+          )}
+        </div>
+        <div class="info-container">
+          <p class="artist-name">{artistName}</p>
+          <p class="song-name">{songName}</p>
+          <div class="meta-row">
+            <div class="star-rating" aria-label="Rating">
+              <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+            </div>
+            <div class="genre-badge">{genre}</div>
+          </div>
+        </div>
+      </>
+    )
+  }
+</article>
+
+<style>
+  .spotify-card {
+    display: flex;
+    flex-direction: row;
+    background-color: var(--color--secondary-white, #ffffff);
+    border-radius: var(--radius-md, 26px);
+    overflow: hidden;
+    max-width: 420px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    font-family: var(--font-family, 'Poppins', sans-serif);
+  }
+
+  .image-container {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    background: #d9d9d9;
+  }
+
+  .album-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .info-container {
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-xs);
+  }
+
+  .artist-name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color--secondary-black, #000000);
+  }
+
+  .song-name {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #666666;
+    font-weight: 400;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+  }
+
+  .star-rating {
+    display: flex;
+    gap: 1px;
+    color: #f5c518;
+    font-size: 0.875rem;
+  }
+
+  .genre-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 12px;
+    border-radius: var(--radius-sm, 3px);
+    border: 1px solid #999999;
+    color: #666666;
+  }
+
+  .error-message {
+    padding: 24px;
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+
+  @media (max-width: 600px) {
+    .spotify-card {
+      flex-direction: column;
+    }
+    .image-container {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+  }
+</style>

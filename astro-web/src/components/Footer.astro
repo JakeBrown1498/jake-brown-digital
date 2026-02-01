@@ -1,0 +1,96 @@
+---
+import './global.css';
+import './tokens.css';
+---
+
+<footer class="global-footer">
+<div class="global-footer-content">
+
+  <!-- Footer logo -->
+    <a href="/">
+      <img src="/JBD_FooterImage.svg" alt="Jake Brown Digital Logo" class="footer-logo" />
+    </a>
+  
+    <!-- Footer contact images -->
+    <div class="global-footer-contact-icons">
+      <a href="https://www.linkedin.com/in/jakebrown1498/" target="_blank">
+        <img src="/JBD_LinkedIn.svg" alt="LinkedIn Icon" class="footer-icon-linkedin" />
+      </a>
+      <a href="mailto:JakeBrown1498@gmail.com" target='_blank'>
+        <img src="/JBD_Mail.svg" alt="Email Icon" class="footer-icon-mail" />
+      </a>
+    </div>
+
+    <!-- Footer links -->
+  <div class="global-footer-links">
+    <ul>
+      <li><a href="/weeknotes">Weeknotes</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </div>
+</div>
+
+<style>
+.global-footer {
+  width: 100%;
+  background-color: var(--color--primary);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 32px;
+  padding-bottom: 40px;
+}
+
+.global-footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-logo {
+  max-width: 113px;
+  height: auto;
+}
+
+.global-footer-contact-icons {
+  display: flex;
+  gap: 32px;
+}
+
+.global-footer-links ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.global-footer-links a {
+  color: #FFFFFF;
+  text-decoration: none;
+  position: relative;
+}
+
+.global-footer-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: #FFFFFF;
+  transition: width 0.5s ease;
+}
+
+.global-footer-links a:hover::after {
+  width: 100%;
+}
+</style>
+
+</footer>

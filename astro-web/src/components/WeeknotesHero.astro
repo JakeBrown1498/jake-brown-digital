@@ -1,0 +1,58 @@
+---
+interface Props {
+  title: string;
+  publishedAt: string;
+  imageUrl?: string;
+}
+
+const { title, publishedAt, imageUrl } = Astro.props;
+
+const formattedDate = new Date(publishedAt).toLocaleDateString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+});
+---
+
+<section class="weeknotes-hero">
+  <h1 class="h1-primary">{title}</h1>
+  <time class="hero-date" datetime={publishedAt}>{formattedDate}</time>
+  {imageUrl && (
+    <div class="hero-image-container">
+      <img src={imageUrl} alt={title} class="hero-image" />
+    </div>
+  )}
+</section>
+
+<style>
+  .weeknotes-hero {
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px;
+    gap: var(--space-sm, 8px);
+  }
+
+  .weeknotes-hero h1 {
+    margin-bottom: 0;
+  }
+
+  .hero-date {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--color--secondary-black, #000000);
+  }
+
+  .hero-image-container {
+    margin-top: var(--space-md, 16px);
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+</style>
