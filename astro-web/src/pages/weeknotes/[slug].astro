@@ -6,14 +6,16 @@ import Nav from "../../components/Nav.astro";
 // This tells Astro which pages to generate
 export async function getStaticPaths() {
   const weeknotes = await sanity.fetch(`
-    *[_type == "weeknotes"] {
+    *[_type == "weeknotes" && defined(slug.current)] {
       "slug": slug.current
     }
   `);
 
-  return weeknotes.map((weeknote) => ({
-    params: { slug: weeknote.slug },
-  }));
+  return weeknotes
+    .filter((weeknote) => weeknote.slug && !weeknote.slug.includes('/'))
+    .map((weeknote) => ({
+      params: { slug: weeknote.slug },
+    }));
 }
 
 const { slug } = Astro.params;
