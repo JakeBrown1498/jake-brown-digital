@@ -1,0 +1,221 @@
+---
+import { sanity } from "../lib/sanity.js";
+import WeeknotesCard from "./WeeknotesCard.astro";
+
+const allWeeknotes = await sanity.fetch(`
+  *[_type == "weeknotesV2" && defined(slug.current) && defined(publishedAt)] | order(publishedAt desc) {
+    title,
+    publishedAt,
+    "slug": slug.current,
+    "imageUrl": heroImage.asset->url
+  }
+`);
+
+const ITEMS_PER_PAGE = 6;
+const totalPages = Math.ceil((allWeeknotes?.length || 0) / ITEMS_PER_PAGE);
+---
+
+<section class="weeknotes-section">
+  <div class="content-wrapper">
+    <div class="weeknotes-header">
+      <div class="weeknotes-header-text">
+        <h2 class="h2-primary">Weeknotes</h2>
+        <p class="body-sm-black">This is where I get up on my soap box, and journal the past week in and out of work. I note what I've been up to, what I've been learning, and most importantly what I've been thinking.</p>
+      </div>
+    </div>
+
+    <div class="weeknotes-grid" id="weeknotes-grid">
+      {
+        allWeeknotes?.map((weeknote: { title: string; publishedAt: string; slug: string; imageUrl?: string }, i: number) => (
+          <div class="card-wrapper" data-page={Math.floor(i / ITEMS_PER_PAGE) + 1} style={i >= ITEMS_PER_PAGE ? 'display:none' : ''}>
+            <WeeknotesCard
+              title={weeknote.title}
+              publishedAt={weeknote.publishedAt}
+              slug={weeknote.slug}
+              imageUrl={weeknote.imageUrl}
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="weeknotes-footer">
+      <div class="pagination" id="pagination" data-total-pages={totalPages}>
+        <button class="pag-btn pag-arrow" id="rewind-btn" disabled aria-label="First page">
+          <img src="/Rewind.svg" alt="" />
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <button
+            class={`pag-btn pag-page${page === 1 ? ' active' : ''}`}
+            data-page={page}
+            aria-label={`Page ${page}`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {totalPages > 4 && <span class="pag-ellipsis">...</span>}
+
+        <button class="pag-btn pag-arrow" id="forwards-btn" aria-label="Last page">
+          <img src="/Forwards.svg" alt="" />
+        </button>
+      </div>
+
+      <div class="read-all-wrapper">
+        <img src="/Group 6.svg" alt="" class="read-all-arrow" />
+        <a href="/weeknotes" class="read-all-button">Read all of my weeknotes</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const grid = document.getElementById('weeknotes-grid');
+  const pagination = document.getElementById('pagination');
+  const rewindBtn = document.getElementById('rewind-btn') as HTMLButtonElement;
+  const forwardsBtn = document.getElementById('forwards-btn') as HTMLButtonElement;
+  const totalPages = parseInt(pagination?.dataset.totalPages || '1');
+  let currentPage = 1;
+
+  function goToPage(page: number) {
+    currentPage = page;
+
+    // Show/hide cards
+    grid?.querySelectorAll<HTMLElement>('.card-wrapper').forEach(card => {
+      card.style.display = parseInt(card.dataset.page || '1') === page ? '' : 'none';
+    });
+
+    // Update active page button
+    pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.page || '1') === page);
+    });
+
+    // Update arrow states
+    if (rewindBtn) rewindBtn.disabled = page === 1;
+    if (forwardsBtn) forwardsBtn.disabled = page === totalPages;
+  }
+
+  pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page || '1')));
+  });
+
+  rewindBtn?.addEventListener('click', () => goToPage(1));
+  forwardsBtn?.addEventListener('click', () => goToPage(totalPages));
+</script>
+
+<style>
+  .weeknotes-section {
+    padding: 64px 0;
+    background-color: var(--color--secondary-background);
+  }
+
+  .weeknotes-header {
+    margin-bottom: 32px;
+  }
+
+  .weeknotes-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 600px;
+  }
+
+  .weeknotes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: var(--space-md, 16px);
+    align-items: stretch;
+  }
+
+  .card-wrapper {
+    height: 100%;
+  }
+
+  .weeknotes-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pag-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--color--secondary-white);
+    color: var(--color--primary-dark);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 400;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pag-btn:hover:not(:disabled) {
+    background-color: var(--color--primary);
+    color: var(--color--secondary-white);
+  }
+
+  .pag-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .pag-btn.active {
+    background-color: var(--color--primary-light);
+    color: var(--color--primary-dark);
+    font-weight: 600;
+  }
+
+  .pag-arrow img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pag-ellipsis {
+    color: var(--color--primary-dark);
+    font-family: var(--font-family);
+    font-weight: 600;
+    padding: 0 4px;
+  }
+
+  /* CTA */
+  .read-all-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .read-all-arrow {
+    width: 100px;
+  }
+
+  .read-all-button {
+    display: inline-block;
+    background-color: var(--color--primary);
+    color: var(--color--secondary-white);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 26px;
+    text-decoration: none;
+  }
+
+  .read-all-button:hover {
+    background-color: var(--color--primary-dark);
+  }
+</style>

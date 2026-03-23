@@ -1,0 +1,90 @@
+---
+interface Props {
+  title: string;
+  publishedAt: string;
+  slug: string;
+  imageUrl?: string;
+}
+
+const { title, publishedAt, slug, imageUrl } = Astro.props;
+
+const formattedDate = new Date(publishedAt).toLocaleDateString('en-GB', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
+---
+
+<a href={`/weeknotes-v2/${slug}`} class="weeknotes-card">
+  <div class="weeknotes-card-image">
+    {imageUrl && <img src={imageUrl} alt={title} />}
+  </div>
+  <div class="weeknotes-card-content">
+    <h3 class="weeknotes-card-title">{title}</h3>
+    <time class="weeknotes-card-date" datetime={publishedAt}>{formattedDate}</time>
+  </div>
+</a>
+
+<style>
+  .weeknotes-card {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    background-color: var(--color--secondary-white, #FFFFFF);
+    border-radius: 0;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow var(--transition-fast, 0.3s ease);
+  }
+
+  .weeknotes-card:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .weeknotes-card-image {
+    width: 50%;
+    flex-shrink: 0;
+    height: 150px;
+    background-color: #c0c0c0;
+  }
+
+  .weeknotes-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .weeknotes-card:hover .weeknotes-card-image img {
+    transform: scale(1.05);
+  }
+
+  .weeknotes-card:hover .weeknotes-card-title {
+    text-decoration: underline;
+  }
+
+  .weeknotes-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px;
+    gap: var(--space-sm, 8px);
+  }
+
+  .weeknotes-card-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-h4, 20px);
+    font-weight: 700;
+    color: var(--color--secondary-black, #000000);
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .weeknotes-card-date {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--color--secondary-black, #000000);
+  }
+</style>

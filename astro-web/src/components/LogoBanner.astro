@@ -3,8 +3,12 @@
 ---
 
 <div class="logo-banner">
+  <h2 class="h2-primary">Where you may have found me</h2>
   <div class="logo-inner">
-    <img src="/RSPCA_logo.png" alt="RSPCA logo" class="logo" />
+    <div class="logo-with-underline">
+      <img src="/RSPCA_logo.png" alt="RSPCA logo" class="logo" />
+      <img src="/Vector 1.png" alt="" class="logo-underline" />
+    </div>
     <img src="/WWF_logo.png" alt="WWF logo" class="logo" />
     <img src="/Unilever_logo.png" alt="Unilever logo" class="logo" />
   </div>
@@ -13,10 +17,12 @@
 <style>
   .logo-banner {
     background-color: var(--color--primary-light, #D9CCFF);
-    padding: 32px 32px;
+    padding: 32px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 16px;
   }
 
   .logo-inner {
@@ -26,7 +32,11 @@
     gap: var(--space-xl, 64px);
     background-color: var(--color--secondary-white, #FFFFFF);
     border-radius: 10px;
-    padding: 24px 48px;
+    padding: 12px 64px;
+  }
+
+  .logo-with-underline {
+    position: relative;
   }
 
   .logo {
@@ -35,10 +45,24 @@
     object-fit: contain;
   }
 
+  .logo-underline {
+    position: absolute;
+    top: 80%;
+    left: 0;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 768px) {
+    .logo-banner {
+      padding: 32px 54px;
+    }
+  }
+
   @media (max-width: 769px) {
     .logo-inner {
       gap: var(--space-lg, 36px);
-      padding: 24px 32px;
+      padding: 12px 20px;
     }
 
     .logo {

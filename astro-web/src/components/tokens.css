@@ -5,7 +5,7 @@
   --color--primary-dark: #270099;
 
   /* Neutral Secondary */
-  --color--secondary: #AAFF33;
+  --color--secondary: #33FFFF;
   --color--secondary-background: #EFECE3;
   --color--secondary-white: #FFFFFF;
   --color--secondary-black: #000000;
@@ -32,6 +32,13 @@
   --radius-md: 26px;
   --radius-lg: 40px;
   
+  /* Breakpoints */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+
   /* Transitions */
   --transition-fast: 0.3s ease;
   --transition-medium: 0.5s ease;

@@ -6,7 +6,9 @@ import HeroHeader from '../components/HeroHeader.astro';
 import Footer from '../components/Footer.astro';
 import SpotifyCard from '../components/SpotifyCard.astro';
 import LogoBanner from '../components/LogoBanner.astro';
-
+import WeeknotesCard from '../components/WeeknotesCard.astro';
+import WeeknotesCarousel from "../components/WeeknotesCarousel.astro";
+import WorkStatus from "../components/WorkStatus.astro";
 
 const homepage = await sanity.fetch(`
   *[_type == "homepage"][0] {
@@ -14,16 +16,19 @@ const homepage = await sanity.fetch(`
     heroHeading,
     heroIntro,
     services,
-    featuredWeeknotes[]->{
-      title,
-      publishedAt,
-      slug,
-      intro
-    },
     contactHeading,
     contactIntro,
     contactPoints,
     socialLinks
+  }
+`);
+
+const recentWeeknotes = await sanity.fetch(`
+  *[_type == "weeknotesV2" && defined(slug.current)] | order(publishedAt desc)[0...3] {
+    title,
+    publishedAt,
+    "slug": slug.current,
+    "imageUrl": heroImage.asset->url
   }
 `);
 ---
@@ -35,26 +40,88 @@ const homepage = await sanity.fetch(`
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
     <title>Jake Brown - Digital Experience Leader</title>
-    
+    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
     <style>
     .what-i-do-container {
       display: flex;
       flex-direction: column;
-      align-items: left;
-      padding: 32px 32px;
+      align-items: flex-start;
+      padding-top: 64px;
+      padding-bottom: 64px;
+      background: var(--color--secondary-background);
+      gap: 8px;
     }
 
-    .what-i-do-container {
+    .what-i-do-full-block {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 0px;
+      width: 100%;
     }
-    .what-i-do-block {
+
+    .what-i-do-pillars-block {
       display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-lg, 32px);
+    }
+
+    .what-i-do-individual-block {
       flex-direction: column;
+      flex: 1;
+      display: flex;
       gap: var(--space-md);
     }
 
+    .pillar-icon {
+      height: 40px;
+      width: auto;
+      display: block;
+      margin-bottom: calc(-1 * var(--space-md));
+    }
+
+    .pillar-icon--1 {
+      margin-left: 55%;
+    }
+
+    .pillar-icon--2 {
+      margin-left: 25%;
+    }
+
+    .pillar-icon--3 {
+      margin-left: 15%;
+    }
+
+    .what-i-do-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .what-i-do-tag {
+      border: 1.5px solid var(--color--primary);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 0.875rem;
+      color: var(--color--primary-dark);
+      background: transparent;
+    }
+
+    .weeknotes-section {
+      padding: 32px 0;
+      background-color: var(--color--primary-light, #D9CCFF);
+    }
+
+    .weeknotes-section h2 {
+      margin-bottom: var(--space-md, 16px);
+    }
+
+    .weeknotes-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md, 16px);
+    }
 
     </style>
   </head>
@@ -70,71 +137,63 @@ const homepage = await sanity.fetch(`
 <!-- Hero Header -->
     <HeroHeader />
 
-<!-- Logo Banner -->
-    <LogoBanner />
+<!-- What I Do Container-->
+    <section class="what-i-do-container content-wrapper">
+      <div class="what-i-do-full-block">
+        <h2 class="h2-primary">Thriving in these three areas</h2>
 
-
-<!-- What I Do -->
-    <section class="what-i-do-container">
-      <div class="what-i-do-block">
-        <h3 class="h3-primary">Digital experience and content</h3>
-        <p class="body-sm-black">Lorem ipsum dolor sit amet consectetur. Neque pulvinar duis tristique nisl at. Arcu diam quis odio euismod aliquet aliquet aliquam vel fermentum.</p>
+        <!-- What I do Pillars -->
+        <div class="what-i-do-pillars-block">
+        <div class="what-i-do-individual-block">
+          <img src="/Group 3.svg" alt="" class="pillar-icon pillar-icon--1" />
+          <h3 class="h3-primary">Digital experience and content</h3>
+          <p class="body-sm-black">Specialising in the end-to-end process of researching, designing, developing and shipping user-centric digital experiences and digital content, driven by intent.</p>
+          <div class="what-i-do-tags">
+            <span class="what-i-do-tag">UX Research</span>
+            <span class="what-i-do-tag">UX Design</span>
+            <span class="what-i-do-tag">Development</span>
+            <span class="what-i-do-tag">Content Design</span>
+            <span class="what-i-do-tag">Copywriting</span>
+            <span class="what-i-do-tag">SEO</span>
+            <span class="what-i-do-tag">Conversion Rate Optimisation</span>
+          </div>
+        </div>
+        <div class="what-i-do-individual-block">
+          <img src="/Group 4.svg" alt="" class="pillar-icon pillar-icon--2" />
+          <h3 class="h3-primary">Digital product</h3>
+          <p class="body-sm-black">Experienced in high-output, efficient agile delivery. I help teams establish ways of working, define governance, and build delivery frameworks that ship quality work consistently.</p>
+          <div class="what-i-do-tags">
+            <span class="what-i-do-tag">Product Discovery</span>
+            <span class="what-i-do-tag">User Stories</span>
+            <span class="what-i-do-tag">Digital Analytics</span>
+            <span class="what-i-do-tag">Product Strategy</span>
+            <span class="what-i-do-tag">Agile</span>
+            <span class="what-i-do-tag">Process Design</span>
+          </div>
+        </div>
+        <div class="what-i-do-individual-block">
+          <img src="/Group 5.svg" alt="" class="pillar-icon pillar-icon--3" />
+          <h3 class="h3-primary">Digital delivery</h3>
+          <p class="body-sm-black">I help organisations define and execute digital strategies that drive meaningful change, from transformation roadmaps and operating model design to identifying where AI can deliver genuine value.</p>
+          <div class="what-i-do-tags">
+            <span class="what-i-do-tag">Digital Transformation</span>
+            <span class="what-i-do-tag">Architecture</span>
+            <span class="what-i-do-tag">Artificial Intelligence</span>
+            <span class="what-i-do-tag">Service Design</span>
+          </div>
+        </div>
       </div>
-      <div class="what-i-do-block">
-        <h3 class="h3-primary">Digital product</h3>
-        <p class="body-sm-black">Lorem ipsum dolor sit amet consectetur. Neque pulvinar duis tristique nisl at. Arcu diam quis odio euismod aliquet aliquet aliquam vel fermentum.</p>
-      </div>
-      <div class="what-i-do-block">
-        <h3 class="h3-primary">Digital strategy</h3>
-        <p class="body-sm-black">Lorem ipsum dolor sit amet consectetur. Neque pulvinar duis tristique nisl at. Arcu diam quis odio euismod aliquet aliquet aliquam vel fermentum.</p>
       </div>
     </section>
 
-      <!-- Spotify -->
-      <section class="spotify container" style="padding: 2rem 0;">
-        <SpotifyCard url="https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT" />
-      </section>
+<!-- Logo Banner -->
+<LogoBanner />
 
-      
-      <!-- Weeknotes -->
-      <section class="weeknotes-section">
-        <div class="container">
-          <h2>Weeknotes</h2>
-          {
-            homepage.featuredWeeknotes?.map((weeknote) => (
-              <a
-                href={`/weeknotes-v2/${weeknote.slug.current}`}
-                class="weeknote-card"
-              >
-                <h3>{weeknote.title}</h3>
-                <time>
-                  {new Date(weeknote.publishedAt).toLocaleDateString()}
-                </time>
-                {weeknote.intro && (
-                  <p>{weeknote.intro[0]?.children[0]?.text}</p>
-                )}
-              </a>
-            ))
-          }
-        </div>
-      </section>
+<WeeknotesCarousel />
 
-      <!-- Contact -->
-      <section class="contact container">
-        <h2>{homepage.contactHeading}</h2>
-        <p>{homepage.contactIntro}</p>
+<WorkStatus />
 
-        {
-          homepage.contactPoints && (
-            <ul>
-              {homepage.contactPoints.map((point) => (
-                <li>{point}</li>
-              ))}
-            </ul>
-          )
-        }
-
-        <ContactForm />
+<ContactForm />
         
       </section>
     </main>

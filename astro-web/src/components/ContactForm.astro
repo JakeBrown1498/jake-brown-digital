@@ -1,55 +1,185 @@
 <section class="contact-section" id="contact">
-  <!--form introduction-->
-  <div class="form-contact">
-    <h2 class="form-title">Contact Me</h2>
-    <p class="form-description">
-      Lorem ipsum dolor sit amet consectetur. Neque pulvinar duis tristique nisl
-      at. Arcu diam quis odio euismod aliquet aliquet aliquam vel fermentum.
-    </p>
-    <ul class="form-description-list">
-      <li class="form-list-item">Lorem Ipsom</li>
-      <li class="form-list-item">Lorem Ipsom</li>
-      <li class="form-list-item">Lorem Ipsom</li>
-    </ul>
+  <div class="content-wrapper">
+    <div class="contact-inner">
+    <!--form introduction-->
+    <div class="form-contact">
+      <h2 class="h2-primary">Contact Me</h2>
+      <div class="form-description-group">
+        <p class="body-sm-black">
+       Looking for some help in shipping digital products or experiences? If you have a project that needs an experienced digital experience leader to help with any of the below, please get in touch:
+        </p>
+        <ul class="form-description-list body-sm-black">
+          <li class="form-list-item">Build something (websites, apps, digital content)</li>
+          <li class="form-list-item">Digital service design and/ or user research</li>
+          <li class="form-list-item">Strategic consultation</li>
+        </ul>
+      </div>
+    </div>
+
+    <form class="contact-me" method="POST">
+      <!--name field-->
+      <div class="input-field">
+        <label for="name" class="form-field-label">Your full name</label>
+        <input type="text" name="name" id="name" required />
+      </div>
+
+      <!--email field-->
+      <div class="input-field">
+        <label for="email" class="form-field-label">Your email</label>
+        <input type="email" name="email" id="email" required />
+      </div>
+
+      <!--message field-->
+      <div class="input-field">
+        <label for="message" class="form-field-label">Message</label>
+        <textarea name="message" id="message" rows="5" required></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">Get in touch</button>
+    </form>
+
+    <script is:inline>
+      const form = document.querySelector('.contact-me');
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const messageInput = document.getElementById('message');
+
+      function showError(input, message) {
+        const field = input.closest('.input-field')!;
+        let error = field.querySelector('.field-error') as HTMLElement;
+        if (!error) {
+          error = document.createElement('span');
+          error.className = 'field-error';
+          field.appendChild(error);
+        }
+        error.textContent = message;
+        input.setAttribute('aria-invalid', 'true');
+      }
+
+      function clearError(input) {
+        const field = input.closest('.input-field')!;
+        const error = field.querySelector('.field-error');
+        if (error) error.remove();
+        input.removeAttribute('aria-invalid');
+      }
+
+      function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      }
+
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let valid = true;
+
+        if (!nameInput.value.trim()) {
+          showError(nameInput, 'Your full name is required');
+          valid = false;
+        } else {
+          clearError(nameInput);
+        }
+
+        if (!emailInput.value.trim()) {
+          showError(emailInput, 'Your email address is required');
+          valid = false;
+        } else if (!isValidEmail(emailInput.value.trim())) {
+          showError(emailInput, 'Please enter a valid email address');
+          valid = false;
+        } else {
+          clearError(emailInput);
+        }
+
+        if (!messageInput.value.trim()) {
+          showError(messageInput, 'A message is required');
+          valid = false;
+        } else {
+          clearError(messageInput);
+        }
+
+        if (valid) form.submit();
+      });
+    </script>
+    </div>
   </div>
-
-  <form class="contact-me" method="POST">
-    <!--name field-->
-    <div class="input-field">
-      <label for="name" class="form-field-label">Full name</label>
-      <input type="text" name="name" id="name" required />
-    </div>
-
-    <!--email field-->
-    <div class="input-field">
-      <label for="email" class="form-field-label">Email</label>
-      <input type="email" name="email" id="email" required />
-    </div>
-
-    <!--message field-->
-    <div class="input-field">
-      <label for="message" class="form-field-label">Message</label>
-      <textarea name="message" id="message" rows="5" required></textarea>
-    </div>
-
-    <button type="submit">Submit your enquiry</button>
-  </form>
 </section>
 
 <style>
-  button {
-    background: #000;
-    color: white;
+
+  .contact-section {
+    padding: 64px;
+  }
+
+  .contact-inner {
+    max-width: 591px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .contact-me {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-description-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-description-list {
+    padding-left: 24px;
+  }
+
+  .input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .input-field input,
+  .input-field textarea {
+    min-height: 44px;
+    border: 1px solid #191919;
+    background: #D9D9D9;
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    padding: 10px 14px;
+  }
+  
+  .field-error {
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+    color: #cc0000;
+  }
+
+  .input-field input[aria-invalid="true"],
+  .input-field textarea[aria-invalid="true"] {
+    border-color: #cc0000;
+  }
+
+  .submit-btn {
+    display: block;
+    margin: 32px auto 0;
+    background: var(--color--primary);
+    color: var(--color--secondary-white);
     padding: 1rem 2rem;
     border: none;
-    border-radius: 4px;
+    border-radius: 26px;
     cursor: pointer;
     font-size: var(--font-size-base, 1rem);
-    font-weight: 400;
+    font-weight: 600;
     font-family: inherit;
   }
 
-  button:hover {
-    background: #333;
+  .submit-btn:hover {
+    background: var(--color--primary-dark);
   }
 </style>

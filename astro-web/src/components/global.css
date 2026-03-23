@@ -16,6 +16,20 @@ body {
   background-color: var(--color--secondary-background);
 }
 
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-right: 32px;
+  padding-left: 32px;
+}
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    padding-right: 54px;
+    padding-left: 54px;
+  }
+}
+
 :root {
   /* Primary Colors */
   --color--primary: #6733FF;
@@ -88,6 +102,14 @@ body {
   line-height: 44px;
 }
 
+.h1--secondary-white {
+  font-size: var(--font-size-h1);
+  font-weight: bold;
+  color: var(--color--secondary-white);
+  margin-bottom: var(--space-md);
+  line-height: 44px;
+}
+
 .h1--secondary-green {
   font-size: var(--font-size-h1);
   font-weight: bold;
@@ -127,6 +149,14 @@ body {
   line-height: 32px
 }
 
+.h2--secondary-white {
+  font-size: var(--font-size-h2);
+  font-weight: bold;
+  color: var(--color--secondary-white);
+  margin-bottom: var(--space-sm);
+  line-height: 32px
+}
+
 .h3-primary {
   font-size: var(--font-size-h3);
   font-weight: bold;
@@ -142,8 +172,15 @@ body {
 }
 
 .h3--secondary-black {
-  font-size: var(--font-size-h1);
+  font-size: var(--font-size-h3);
   font-weight: bold;
   color: var(--color--secondary-black);
+  line-height: 32px;
+}
+
+.h3--secondary-white {
+  font-size: var(--font-size-h3);
+  font-weight: bold;
+  color: var(--color--secondary-white);
   line-height: 32px;
 }

@@ -1,0 +1,20 @@
+---
+// Button.astro
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'tags';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { variant = 'primary', size = 'md' } = Astro.props;
+
+const variantStyles = {
+  primary: 'bg-blue-600 text-white hover:bg-blue-700',
+  secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+  ghost: 'bg-transparent hover:bg-gray-100',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+};
+---
+
+<button class:list={[variantStyles[variant], sizeStyles[size]]}>
+  <slot />
+</button>
