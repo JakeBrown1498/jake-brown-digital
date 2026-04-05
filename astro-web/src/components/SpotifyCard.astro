@@ -6,7 +6,8 @@ interface Props {
 const { url } = Astro.props;
 
 // 1. Extract Track ID from URL
-const getTrackId = (spotifyUrl: string) => {
+const getTrackId = (spotifyUrl: string | null | undefined) => {
+  if (!spotifyUrl) return null;
   try {
     const urlObj = new URL(spotifyUrl);
     const pathSegments = urlObj.pathname.split("/");
