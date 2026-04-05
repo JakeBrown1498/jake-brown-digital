@@ -1,73 +1,225 @@
 ---
 import { sanity } from "../lib/sanity.js";
-import Nav from '../components/Nav.astro'
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import WeeknotesCard from '../components/WeeknotesCard.astro';
 
 const weeknotes = await sanity.fetch(`
-  *[_type == "weeknotesV2"] | order(publishedAt desc) {
+  *[_type == "weeknotesV2" && defined(slug.current) && defined(publishedAt)] | order(publishedAt desc) {
     _id,
     title,
     publishedAt,
-    slug
+    "slug": slug.current,
+    "imageUrl": heroImage.asset->url
   }
 `);
+
+const ITEMS_PER_PAGE = 9;
+const totalPages = Math.ceil((weeknotes?.length || 0) / ITEMS_PER_PAGE);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Weeknotes</title>
-    <style>
-      body {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-        font-family: system-ui, sans-serif;
-      }
-      .breadcrumbs {
-        margin-bottom: 2rem;
-        font-size: 0.9rem;
-        color: #666;
-      }
-      .breadcrumbs a {
-        color: #0066cc;
-        text-decoration: none;
-      }
-      article {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        border: 1px solid #eee;
-        border-radius: 8px;
-      }
-      article a {
-        text-decoration: none;
-        color: inherit;
-      }
-      article a:hover h2 {
-        color: #0066cc;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
+    <title>Weeknotes - Jake Brown Digital</title>
+    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
   </head>
   <body>
-    <body>
-  <Nav />
-    <nav class="breadcrumbs">
-      <a href="/">Home</a>
-      <span>/</span>
-      <span>Weeknotes</span>
-    </nav>
+    <Nav />
 
-    <h1>Weeknotes</h1>
+    <section class="weeknotes-page-hero">
+      <div class="content-wrapper">
+        <div class="hero-breadcrumbs">
+          <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Weeknotes' }]} />
+        </div>
+        <h1 class="h1--secondary-white">Weeknotes</h1>
+        <p class="body-sm-neutral hero-description">Personal reflections on what I've been doing each week. I started these weeknotes in 2025, and intend in writing indefinitely.</p>
+      </div>
+    </section>
 
-    {
-      weeknotes.map((note) => (
-        <article>
-          <a href={`/weeknotes-v2/${note.slug.current}`}>
-            <h2>{note.title}</h2>
-            <time>{new Date(note.publishedAt).toLocaleDateString()}</time>
-          </a>
-        </article>
-      ))
-    }
+    <section class="weeknotes-listing">
+      <div class="content-wrapper">
+        <div class="weeknotes-grid" id="weeknotes-grid">
+          {
+            weeknotes?.map((note: { title: string; publishedAt: string; slug: string; imageUrl?: string }, i: number) => (
+              <div class="card-wrapper" data-page={Math.floor(i / ITEMS_PER_PAGE) + 1} style={i >= ITEMS_PER_PAGE ? 'display:none' : ''}>
+                <WeeknotesCard
+                  title={note.title}
+                  publishedAt={note.publishedAt}
+                  slug={note.slug}
+                  imageUrl={note.imageUrl}
+                  layout="vertical"
+                />
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="pagination-wrapper">
+          <div class="pagination" id="pagination" data-total-pages={totalPages}>
+            <button class="pag-btn pag-arrow" id="rewind-btn" disabled aria-label="First page">
+              <img src="/Rewind.svg" alt="" />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                class={`pag-btn pag-page${page === 1 ? ' active' : ''}`}
+                data-page={page}
+                aria-label={`Page ${page}`}
+              >
+                {page}
+              </button>
+            ))}
+
+            {totalPages > 4 && <span class="pag-ellipsis">...</span>}
+
+            <button class="pag-btn pag-arrow" id="forwards-btn" aria-label="Last page">
+              <img src="/Forwards.svg" alt="" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Footer />
   </body>
 </html>
+
+<script>
+  const grid = document.getElementById('weeknotes-grid');
+  const pagination = document.getElementById('pagination');
+  const rewindBtn = document.getElementById('rewind-btn') as HTMLButtonElement;
+  const forwardsBtn = document.getElementById('forwards-btn') as HTMLButtonElement;
+  const totalPages = parseInt(pagination?.dataset.totalPages || '1');
+  let currentPage = 1;
+
+  function goToPage(page: number) {
+    currentPage = page;
+
+    grid?.querySelectorAll<HTMLElement>('.card-wrapper').forEach(card => {
+      card.style.display = parseInt(card.dataset.page || '1') === page ? '' : 'none';
+    });
+
+    pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.page || '1') === page);
+    });
+
+    if (rewindBtn) rewindBtn.disabled = page === 1;
+    if (forwardsBtn) forwardsBtn.disabled = page === totalPages;
+  }
+
+  pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
+    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page || '1')));
+  });
+
+  rewindBtn?.addEventListener('click', () => goToPage(1));
+  forwardsBtn?.addEventListener('click', () => goToPage(totalPages));
+</script>
+
+<style>
+  .weeknotes-page-hero {
+    background-color: var(--color--primary-dark);
+    padding: 80px 0;
+  }
+
+  .hero-breadcrumbs {
+    margin-bottom: 24px;
+  }
+
+  .hero-breadcrumbs :global(.breadcrumbs a) {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .hero-breadcrumbs :global(.breadcrumbs .current) {
+    color: #ffffff;
+  }
+
+  .hero-breadcrumbs :global(.breadcrumbs .separator) {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .hero-description {
+    max-width: 540px;
+  }
+
+  .weeknotes-listing {
+    padding: 64px 0;
+  }
+
+  .weeknotes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .card-wrapper {
+    height: 100%;
+  }
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pag-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--color--secondary-white);
+    color: var(--color--primary-dark);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 400;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .pag-btn:hover:not(:disabled) {
+    background-color: var(--color--primary);
+    color: var(--color--secondary-white);
+  }
+
+  .pag-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .pag-btn.active {
+    background-color: var(--color--primary-light);
+    color: var(--color--primary-dark);
+    font-weight: 600;
+  }
+
+  .pag-arrow img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pag-ellipsis {
+    color: var(--color--primary-dark);
+    font-family: var(--font-family);
+    font-weight: 600;
+    padding: 0 4px;
+  }
+
+  @media (max-width: 768px) {
+    .weeknotes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

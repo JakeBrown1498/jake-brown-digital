@@ -1,0 +1,60 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
+    <title>Thanks - Jake Brown Digital</title>
+    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
+  </head>
+  <body>
+    <Nav />
+
+    <section class="thanks-hero">
+      <div class="content-wrapper">
+        <h1 class="h1--secondary-white">Thanks for getting in touch.</h1>
+        <p class="body-sm-neutral hero-description">I'll get back to you as soon as I can. In the meantime, feel free to explore the rest of the site.</p>
+        <a href="/" class="back-btn">Back to home</a>
+      </div>
+    </section>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .thanks-hero {
+    background-color: var(--color--primary-dark);
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    padding: 80px 0;
+  }
+
+  .hero-description {
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+
+  .back-btn {
+    display: inline-block;
+    background-color: var(--color--secondary);
+    color: var(--color--primary-dark);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 26px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .back-btn:hover {
+    opacity: 0.85;
+  }
+</style>

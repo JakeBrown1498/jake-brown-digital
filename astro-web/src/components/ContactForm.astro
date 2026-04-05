@@ -9,14 +9,15 @@
        Looking for some help in shipping digital products or experiences? If you have a project that needs an experienced digital experience leader to help with any of the below, please get in touch:
         </p>
         <ul class="form-description-list body-sm-black">
-          <li class="form-list-item">Build something (websites, apps, digital content)</li>
+          <li class="form-list-item">Build something (websites, apps, digital content, etc.)</li>
           <li class="form-list-item">Digital service design and/ or user research</li>
           <li class="form-list-item">Strategic consultation</li>
         </ul>
       </div>
     </div>
 
-    <form class="contact-me" method="POST">
+    <form class="contact-me" method="POST" action="https://formspree.io/f/myknqqek">
+      <input type="hidden" name="_next" value="https://jakebrowndigital.com/thanks" />
       <!--name field-->
       <div class="input-field">
         <label for="name" class="form-field-label">Your full name</label>
@@ -95,7 +96,21 @@
           clearError(messageInput);
         }
 
-        if (valid) form.submit();
+        if (valid) {
+          fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          }).then(res => {
+            if (res.ok) {
+              window.location.href = '/thanks';
+            } else {
+              alert('Something went wrong. Please try again.');
+            }
+          }).catch(() => {
+            alert('Something went wrong. Please try again.');
+          });
+        }
       });
     </script>
     </div>
@@ -144,6 +159,10 @@
     gap: 4px;
   }
 
+  .form-field-label {
+    font-weight: 600;
+  }
+
   .input-field input,
   .input-field textarea {
     min-height: 44px;
@@ -181,5 +200,12 @@
 
   .submit-btn:hover {
     background: var(--color--primary-dark);
+  }
+
+  @media (max-width: 767px) {
+    .contact-section {
+      padding-left: 32px;
+      padding-right: 32px;
+    }
   }
 </style>

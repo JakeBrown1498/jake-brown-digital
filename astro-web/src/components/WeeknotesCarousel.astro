@@ -75,33 +75,92 @@ const totalPages = Math.ceil((allWeeknotes?.length || 0) / ITEMS_PER_PAGE);
   const pagination = document.getElementById('pagination');
   const rewindBtn = document.getElementById('rewind-btn') as HTMLButtonElement;
   const forwardsBtn = document.getElementById('forwards-btn') as HTMLButtonElement;
-  const totalPages = parseInt(pagination?.dataset.totalPages || '1');
+
+  const DESKTOP_PER_PAGE = 6;
+  const MOBILE_PER_PAGE = 3;
+  const cards = Array.from(grid?.querySelectorAll<HTMLElement>('.card-wrapper') || []);
   let currentPage = 1;
+
+  function isMobile() {
+    return window.innerWidth < 768;
+  }
+
+  function getPerPage() {
+    return isMobile() ? MOBILE_PER_PAGE : DESKTOP_PER_PAGE;
+  }
+
+  function getTotalPages() {
+    return Math.ceil(cards.length / getPerPage());
+  }
+
+  function makePageBtn(i: number) {
+    const btn = document.createElement('button');
+    btn.className = `pag-btn pag-page${i === currentPage ? ' active' : ''}`;
+    btn.dataset.page = String(i);
+    btn.setAttribute('aria-label', `Page ${i}`);
+    btn.textContent = String(i);
+    btn.addEventListener('click', () => goToPage(i));
+    return btn;
+  }
+
+  function rebuildPagination() {
+    pagination?.querySelectorAll('.pag-page, .pag-ellipsis').forEach(el => el.remove());
+    const total = getTotalPages();
+
+    if (isMobile() && total > 3) {
+      // Sliding window of 3 pages centred on current
+      let start = Math.max(1, currentPage - 1);
+      let end = Math.min(total, start + 2);
+      if (end - start < 2) start = Math.max(1, end - 2);
+
+      for (let i = start; i <= end; i++) {
+        pagination?.insertBefore(makePageBtn(i), forwardsBtn);
+      }
+
+      if (end < total) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'pag-ellipsis';
+        ellipsis.textContent = '...';
+        pagination?.insertBefore(ellipsis, forwardsBtn);
+      }
+    } else {
+      for (let i = 1; i <= total; i++) {
+        pagination?.insertBefore(makePageBtn(i), forwardsBtn);
+      }
+    }
+  }
 
   function goToPage(page: number) {
     currentPage = page;
+    const perPage = getPerPage();
 
-    // Show/hide cards
-    grid?.querySelectorAll<HTMLElement>('.card-wrapper').forEach(card => {
-      card.style.display = parseInt(card.dataset.page || '1') === page ? '' : 'none';
+    cards.forEach((card, index) => {
+      const cardPage = Math.floor(index / perPage) + 1;
+      card.style.display = cardPage === page ? '' : 'none';
     });
 
-    // Update active page button
-    pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.dataset.page || '1') === page);
-    });
+    rebuildPagination();
 
-    // Update arrow states
     if (rewindBtn) rewindBtn.disabled = page === 1;
-    if (forwardsBtn) forwardsBtn.disabled = page === totalPages;
+    if (forwardsBtn) forwardsBtn.disabled = page === getTotalPages();
   }
 
-  pagination?.querySelectorAll<HTMLButtonElement>('.pag-page').forEach(btn => {
-    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page || '1')));
-  });
+  function init() {
+    currentPage = 1;
+    rebuildPagination();
+    goToPage(1);
+  }
 
   rewindBtn?.addEventListener('click', () => goToPage(1));
-  forwardsBtn?.addEventListener('click', () => goToPage(totalPages));
+  forwardsBtn?.addEventListener('click', () => goToPage(getTotalPages()));
+
+  init();
+
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(init, 150);
+  });
 </script>
 
 <style>
@@ -147,7 +206,7 @@ const totalPages = Math.ceil((allWeeknotes?.length || 0) / ITEMS_PER_PAGE);
     gap: 8px;
   }
 
-  .pag-btn {
+  :global(.pag-btn) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -164,28 +223,28 @@ const totalPages = Math.ceil((allWeeknotes?.length || 0) / ITEMS_PER_PAGE);
     transition: background-color 0.2s ease;
   }
 
-  .pag-btn:hover:not(:disabled) {
+  :global(.pag-btn:hover:not(:disabled)) {
     background-color: var(--color--primary);
     color: var(--color--secondary-white);
   }
 
-  .pag-btn:disabled {
+  :global(.pag-btn:disabled) {
     opacity: 0.4;
     cursor: default;
   }
 
-  .pag-btn.active {
+  :global(.pag-btn.active) {
     background-color: var(--color--primary-light);
     color: var(--color--primary-dark);
     font-weight: 600;
   }
 
-  .pag-arrow img {
+  :global(.pag-arrow img) {
     width: 16px;
     height: 16px;
   }
 
-  .pag-ellipsis {
+  :global(.pag-ellipsis) {
     color: var(--color--primary-dark);
     font-family: var(--font-family);
     font-weight: 600;
@@ -217,5 +276,21 @@ const totalPages = Math.ceil((allWeeknotes?.length || 0) / ITEMS_PER_PAGE);
 
   .read-all-button:hover {
     background-color: var(--color--primary-dark);
+  }
+
+  @media (max-width: 767px) {
+    .weeknotes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .weeknotes-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    .read-all-arrow {
+      display: none;
+    }
   }
 </style>
