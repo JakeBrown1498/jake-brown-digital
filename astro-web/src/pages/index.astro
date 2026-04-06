@@ -9,6 +9,7 @@ import LogoBanner from '../components/LogoBanner.astro';
 import WeeknotesCard from '../components/WeeknotesCard.astro';
 import WeeknotesCarousel from "../components/WeeknotesCarousel.astro";
 import WorkStatus from "../components/WorkStatus.astro";
+import Layout from "../layouts/Layout.astro";
 
 const homepage = await sanity.fetch(`
   *[_type == "homepage"][0] {
@@ -33,15 +34,8 @@ const recentWeeknotes = await sanity.fetch(`
 `);
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
-    <title>Jake Brown - Digital Experience Leader</title>
-    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
-    <style>
+<Layout title="Jake Brown - Digital Experience Leader">
+  <style slot="head">
     .what-i-do-container {
       display: flex;
       flex-direction: column;
@@ -134,9 +128,6 @@ const recentWeeknotes = await sanity.fetch(`
     }
 
     </style>
-  </head>
-
-<!-- End of Head -->
 
 <!-- Navigation-->
     <Nav />
@@ -210,5 +201,4 @@ const recentWeeknotes = await sanity.fetch(`
 
     <!-- Footer -->
     <Footer />
-  </body>
-</html>
+</Layout>

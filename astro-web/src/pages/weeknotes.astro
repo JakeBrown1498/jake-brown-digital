@@ -4,6 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import WeeknotesCard from '../components/WeeknotesCard.astro';
+import Layout from '../layouts/Layout.astro';
 
 const weeknotes = await sanity.fetch(`
   *[_type == "weeknotesV2" && defined(slug.current) && defined(publishedAt)] | order(publishedAt desc) {
@@ -19,16 +20,7 @@ const ITEMS_PER_PAGE = 9;
 const totalPages = Math.ceil((weeknotes?.length || 0) / ITEMS_PER_PAGE);
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
-    <title>Weeknotes - Jake Brown Digital</title>
-    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
-  </head>
-  <body>
+<Layout title="Weeknotes - Jake Brown Digital">
     <Nav />
 
     <section class="weeknotes-page-hero">
@@ -86,8 +78,7 @@ const totalPages = Math.ceil((weeknotes?.length || 0) / ITEMS_PER_PAGE);
     </section>
 
     <Footer />
-  </body>
-</html>
+</Layout>
 
 <script>
   const grid = document.getElementById('weeknotes-grid');

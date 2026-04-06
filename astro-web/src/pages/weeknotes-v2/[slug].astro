@@ -5,6 +5,7 @@ import Nav from "../../components/Nav.astro";
 import Footer from "../../components/Footer.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import SpotifyCard from "../../components/SpotifyCard.astro";
+import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
   const weeknotes = await sanity.fetch(`
@@ -82,16 +83,7 @@ const renderStars = (rating: number) => {
 };
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap' rel='stylesheet'>
-    <title>{weeknote.title} - Jake Brown</title>
-    <link rel="icon" type="image/x-icon" href="/JBD_Favicon.svg"/>
-  </head>
-  <body>
+<Layout title={`${weeknote.title} - Jake Brown`}>
     <Nav />
 
     <!-- Hero -->
@@ -203,8 +195,7 @@ const renderStars = (rating: number) => {
     </div>
 
     <Footer />
-  </body>
-</html>
+</Layout>
 
 <style>
   /* Shared narrow column */
